@@ -58,9 +58,6 @@ router.post('/usuarios', authenticateToken, authorizeAdmin, async (req, res) => 
   }
 });
 
-// backend/routes/admin.routes.js (o donde tengas la ruta PUT /usuarios/:id)
-
-// En backend/routes/admin.routes.js (o donde manejes usuarios)
 
 router.put('/usuarios/:id', authenticateToken, authorizeAdmin, async (req, res) => {
     const { id } = req.params;
@@ -103,8 +100,7 @@ router.delete('/usuarios/:id', authenticateToken, authorizeAdmin, async (req, re
   }
 });
 
-// Ruta para subir foto (usa el middleware upload que creamos antes)
-// Nota: Necesitamos importar upload si vamos a usarlo aquí.
+// Ruta para subir foto 
 const upload = require('../middleware/upload');
 
 router.put('/usuarios/:id/foto', authenticateToken, authorizeAdmin, upload.single('foto'), async (req, res) => {
