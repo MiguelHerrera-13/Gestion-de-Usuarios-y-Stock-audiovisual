@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.env
+base de datos meka (2).sql
+*.sql
+backend/uploads/
+.DS_Store

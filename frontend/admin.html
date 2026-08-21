@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>MEKA Admin</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#7f13ec",
+            "background-dark": "#141118",
+            "card-dark": "#1E1E1E",
+            "input-dark": "#302839",
+          },
+          fontFamily: { display: ["Inter", "sans-serif"] },
+        },
+      },
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    }
+
+    .page-content {
+      display: none;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 50;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-backdrop.flex {
+      display: flex;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <style>
+    .fc-daygrid-day-number {
+      color: #E0E0E0 !important;
+      text-decoration: none !important;
+    }
+
+    .fc-col-header-cell-cushion {
+      color: #333 !important;
+      text-decoration: none !important;
+    }
+
+    .fc-border-primary {
+      border-color: #302839 !important;
+    }
+
+    .fc-day-today {
+      background-color: #7f13ec20 !important;
+    }
+
+    .fc-event-time,
+    .fc-event-title {
+      color: #FFFFFF !important;
+    }
+
+    .fc-list-day-cushion {
+      color: #333 !important;
+    }
+
+    .fc-list-event:not(.fc-event-solid) .fc-list-event-title a,
+    .fc-list-event:not(.fc-event-solid) .fc-list-event-time {
+      color: #ffffff !important;
+    }
+
+    .fc-list-event:hover td {
+      background-color: transparent !important;
+    }
+  </style>
+</head>
+
+
+
+<body class="bg-background-dark font-display text-gray-200">
+  <div class="flex h-screen">
+    <aside class="flex flex-col w-64 bg-[#1A1A1A]">
+      <div class="flex items-center justify-center h-20 border-b border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" id="user-avatar-sidebar">
+          </div>
+          <h1 class="text-white text-xl font-bold">MEKA</h1>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+          href="#" data-page="users"><span class="material-symbols-outlined">group</span><span
+            class="text-sm font-medium">Gestion de Usuarios</span></a>
+        <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+          href="#" data-page="providers"><span class="material-symbols-outlined">local_shipping</span><span
+            class="text-sm font-medium">Proveedores</span></a>
+        <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+          href="#" data-page="stock"><span class="material-symbols-outlined">inventory_2</span><span
+            class="text-sm font-medium">Stock</span></a>
+        <a class="nav-link flex items-center justify-between px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+          href="#" data-page="notifications">
+
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined">notifications</span>
+            <span class="text-sm font-medium">Notificaciones</span>
+          </div>
+
+          <span id="sidebar-notif-badge"
+            class="hidden w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse"></span>
+        </a>
+        <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+          href="#" data-page="calendar"><span class="material-symbols-outlined">calendar_today</span><span
+            class="text-sm font-medium">Calendario de Eventos</span></a>
+      </nav>
+      <div class="p-4 border-t border-gray-800">
+        <button id="logout-button-admin"
+          class="flex items-center gap-3 px-4 py-2 rounded-lg w-full text-gray-400 hover:bg-primary/20 hover:text-white transition-colors">
+          <span class="material-symbols-outlined">logout</span>
+          <span class="text-sm font-medium">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+      <div id="users-page" class="page-content">
+        <div class="p-8">
+          <h1 class="text-white text-4xl font-black mb-8">
+            Gestion de Usuarios
+          </h1>
+          <div class="flex gap-3 mb-6">
+            <button id="btn-abrir-modal-add-user"
+              class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90">
+              <span class="material-symbols-outlined">add</span><span>Añadir Usuario</span>
+            </button>
+          </div>
+          <div id="user-grid-container" class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-6"></div>
+          <input type="file" id="photo-uploader" class="hidden" accept="image/*" />
+        </div>
+      </div>
+
+      <div id="providers-page" class="page-content">
+        <div class="p-8">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-white text-4xl font-black">Proveedores</h1>
+            <button id="btn-abrir-modal-add-provider"
+              class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90">
+              <span class="material-symbols-outlined">add</span><span>Añadir Proveedor</span>
+            </button>
+          </div>
+          <div class="overflow-hidden rounded-lg border border-[#302839] bg-[#191022]">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-[#211c27]">
+                  <th class="px-6 py-4">Proveedor</th>
+                  <th class="px-6 py-4">Contacto</th>
+                  <th class="px-6 py-4">Teléfono</th>
+                  <th class="px-6 py-4">Email</th>
+                  <th class="px-6 py-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="providers-tbody" class="divide-y divide-[#302839]"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="stock-page" class="page-content">
+        <div class="p-8">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-white text-4xl font-black">Gestión de Stock</h1>
+            <button id="btn-abrir-modal-add-material"
+              class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90">
+              <span class="material-symbols-outlined">add</span><span>Añadir Material</span>
+            </button>
+          </div>
+          <div id="stock-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+      </div>
+
+      <div id="materials-page" class="page-content">
+        <div class="p-8">
+          <h1 class="text-white text-4xl font-black">Material Audiovisual</h1>
+          <p class="mt-4 text-gray-400">
+            Esta sección muestra el mismo contenido que "Stock".
+          </p>
+        </div>
+      </div>
+      <div id="notifications-page" class="page-content">
+        <div class="p-8 space-y-8">
+          <div>
+            <h1 class="text-white text-4xl font-black mb-6">Solicitudes Pendientes</h1>
+            <div class="overflow-hidden rounded-lg border border-[#302839] bg-[#191022]">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="bg-[#211c27]">
+                    <th class="px-6 py-4">Evento</th>
+                    <th class="px-6 py-4">Material Solicitado</th>
+                    <th class="px-6 py-4">Cantidad</th>
+                    <th class="px-6 py-4">Stock Actual</th>
+                    <th class="px-6 py-4 text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="notifications-tbody" class="divide-y divide-[#302839]"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-white text-2xl font-bold">Historial de Avisos</h2>
+              <button onclick="marcarTodasLeidas()" class="text-xs text-primary hover:underline cursor-pointer">Marcar
+                todo como leído</button>
+            </div>
+            <div class="overflow-hidden rounded-lg border border-[#302839] bg-[#191022]">
+              <table class="w-full text-left">
+                <tbody id="history-notifications-tbody" class="divide-y divide-[#302839]">
+                  <tr>
+                    <td class="p-4 text-gray-500 text-center">Cargando...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div id="calendar-page" class="page-content">
+        <div class="p-8">
+          <h1 class="text-white text-4xl font-black mb-8">Calendario de Eventos</h1>
+          <div class="flex gap-3 mb-6">
+            <button id="btn-abrir-modal-add-evento"
+              class="flex items-center gap-2 rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold hover:bg-primary/90">
+              <span class="material-symbols-outlined">add</span>
+              <span>Añadir Evento</span>
+            </button>
+          </div>
+          <div id="admin-calendar"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal-user" class="modal-backdrop">
+    <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-md m-4">
+      <form id="form-user" class="p-8 space-y-6">
+        <h2 class="text-white text-2xl font-bold" id="modal-user-title"></h2>
+        <input type="hidden" name="id_usuario" />
+        <div class="grid grid-cols-2 gap-4">
+          <input type="text" name="nombre" placeholder="Nombre"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+          <input type="text" name="apellido" placeholder="Apellido"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+        </div>
+        <input type="email" name="email" placeholder="Email"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+        <input type="password" name="password" placeholder="Contraseña"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        <select name="rol_id"
+          class="form-select w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"
+          required></select>
+        <div class="flex justify-end gap-4 pt-4">
+          <button type="button" class="btn-cancel-modal px-4 py-2 rounded-lg text-white/70 hover:bg-white/10">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-provider" class="modal-backdrop">
+    <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-md m-4">
+      <form id="form-provider" class="p-8 space-y-6">
+        <h2 class="text-white text-2xl font-bold" id="modal-provider-title"></h2>
+        <input type="hidden" name="id_proveedor" />
+        <input type="text" name="nombre_proveedor" placeholder="Nombre del Proveedor"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+        <input type="text" name="contacto" placeholder="Persona de Contacto"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        <input type="tel" name="telefono" placeholder="Teléfono"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        <input type="email" name="email" placeholder="Email"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        <textarea name="observaciones" placeholder="Observaciones"
+          class="form-textarea w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"></textarea>
+        <div class="flex justify-end gap-4 pt-4">
+          <button type="button" class="btn-cancel-modal px-4 py-2 rounded-lg text-white/70 hover:bg-white/10">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-material" class="modal-backdrop">
+    <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-md m-4">
+      <form id="form-material" class="p-8 space-y-6">
+        <h2 class="text-white text-2xl font-bold" id="modal-material-title"></h2>
+        <input type="hidden" name="id_material" />
+        <input type="text" name="nombre_material" placeholder="Nombre del Material"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+        <textarea name="descripcion_material" placeholder="Descripción"
+          class="form-textarea w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"></textarea>
+        <div class="grid grid-cols-2 gap-4">
+          <input type="number" name="cantidad" placeholder="Cantidad"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+          <input type="number" name="umbral_minimo" placeholder="Umbral Mínimo"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        </div>
+        <select name="estado"
+          class="form-select w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" required>
+          <option>Disponible</option>
+          <option>En Mantenimiento</option>
+          <option>Fuera de Servicio</option>
+        </select>
+        <select name="categoria_id"
+          class="form-select w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"
+          required></select>
+        <div class="flex justify-end gap-4 pt-4">
+          <button type="button" class="btn-cancel-modal px-4 py-2 rounded-lg text-white/70 hover:bg-white/10">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-evento" class="modal-backdrop">
+    <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-md m-4">
+      <form id="form-evento" class="p-8 space-y-6">
+        <h2 class="text-white text-2xl font-bold" id="modal-evento-title">Añadir Evento</h2>
+        <input type="hidden" name="id_evento" />
+        <input type="text" name="nombre_evento" placeholder="Nombre del Evento"
+          class="form-input w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+        <div class="grid grid-cols-2 gap-4">
+          <input type="date" name="fecha" placeholder="Fecha"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" required />
+          <input type="time" name="hora" placeholder="Hora"
+            class="form-input bg-input-dark text-white border-none rounded-lg focus:ring-primary" />
+        </div>
+        <textarea name="descripcion" placeholder="Descripción (Pública)" rows="3"
+          class="form-textarea w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"></textarea>
+        <textarea name="notas_internas" placeholder="Notas Internas (Solo Admin/Técnicos)" rows="3"
+          class="form-textarea w-full bg-input-dark text-white border-none rounded-lg focus:ring-primary"></textarea>
+        <div class="flex justify-between w-full pt-4">
+          <button type="button" id="btn-delete-evento"
+            class="px-4 py-2 rounded-lg bg-red-600/20 text-red-400 font-bold hover:bg-red-600/30 hidden">
+            Eliminar
+          </button>
+          <div class="flex gap-4">
+            <button type="button" class="btn-cancel-modal px-4 py-2 rounded-lg text-white/70 hover:bg-white/10">
+              Cancelar
+            </button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
+              Guardar Evento
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/admin.js"></script>
+
+</body>
+
+</html>

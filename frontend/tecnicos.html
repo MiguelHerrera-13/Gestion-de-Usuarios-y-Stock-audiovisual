@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MEKA Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f13ec",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#141118",
+                        "card-dark": "#1E1E1E",
+                        "input-dark": "#302839",
+                        "secondary-text-dark": "#A9A9A9",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+
+        .group:hover .group-hover\:border-primary {
+            border-color: #7f13ec;
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-backdrop.flex {
+            display: flex;
+        }
+
+        .material-item.selected {
+            background-color: #7f13ec;
+            color: #000000;
+        }
+    </style>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <style>
+        .fc-daygrid-day-number {
+            color: #E0E0E0 !important;
+            text-decoration: none !important;
+        }
+
+        .fc-col-header-cell-cushion {
+            color: #333 !important;
+            text-decoration: none !important;
+        }
+
+        .fc-border-primary {
+            border-color: #302839 !important;
+        }
+
+        .fc-day-today {
+            background-color: #7f13ec20 !important;
+        }
+
+        .fc-event-time,
+        .fc-event-title {
+            color: #FFFFFF !important;
+        }
+
+        .fc-list-day-cushion {
+            color: #333 !important;
+        }
+
+        .fc-list-event:not(.fc-event-solid) .fc-list-event-title a,
+        .fc-list-event:not(.fc-event-solid) .fc-list-event-time {
+            color: #ffffff !important;
+        }
+
+        .fc-list-event:hover td {
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark font-display text-gray-200">
+    <div class="flex h-screen">
+        <aside class="flex flex-col w-64 bg-[#1A1A1A] text-gray-200">
+            <div class="flex items-center justify-center h-20 border-b border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                        style='background-image: url("LOGOMEKA.png");'>
+                    </div>
+                    <h1 class="text-white text-xl font-bold">MEKA</h1>
+                </div>
+            </div>
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+                    href="#" data-page="event-materials">
+                    <span class="material-symbols-outlined">description</span>
+                    <span class="text-sm font-medium">Materiales Eventos</span>
+                </a>
+                <a class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-primary/20 hover:text-white transition-colors"
+                    href="#" data-page="event-calendar">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    <span class="text-sm font-medium">Calendario Eventos</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-800">
+                <button id="logout-button-tecnico"
+                    class="flex items-center gap-3 px-4 py-2 rounded-lg w-full text-gray-400 hover:bg-primary/20 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-medium">Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+            <div id="event-materials-page" class="page-content active">
+                <div class="flex h-screen">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="flex flex-col">
+                        </div>
+                    </div>
+                    <nav class="flex flex-col gap-2">
+                    </nav>
+
+                    <main class="flex-1 flex flex-col p-8 overflow-y-auto">
+                        <header class="flex flex-wrap justify-between items-center gap-3 mb-6">
+                            <h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">
+                                Materiales
+                                Eventos</h1>
+                            <button id="btn-abrir-modal-asignar"
+                                class="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors">
+                                <span class="material-symbols-outlined">add</span>
+                                <span class="truncate">Asignar Materiales</span>
+                            </button>
+                            </button>
+                        </header>
+                        <div class="border-b border-[#413b54] mb-6">
+                            <nav class="flex gap-8">
+                            </nav>
+                        </div>
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="flex-1">
+                                <label class="flex flex-col min-w-40 h-12 w-full">
+                                    <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                                        <div
+                                            class="text-[#a49db9] flex border-none bg-[#2c2839] items-center justify-center pl-4 rounded-l-lg border-r-0">
+                                            <span class="material-symbols-outlined">search</span>
+                                        </div>
+                                        <input
+                                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#2c2839] focus:border-none h-full placeholder:text-[#a49db9] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                                            placeholder="Buscar Materiales...." value="" />
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="flex gap-3">
+                                <button id="btn-filter-all"
+                                    class="filter-btn flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#2c2839] pl-3 pr-3 hover:bg-primary/30">
+                                    <span class="material-symbols-outlined text-base">list</span>
+                                    <p class="text-white text-sm font-medium leading-normal">Todos</p>
+                                    <span class="material-symbols-outlined text-base">arrow_drop_down</span>
+                                </button>
+                                <button id="btn-filter-stock"
+                                    class="filter-btn flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#2c2839] pl-3 pr-3 hover:bg-primary/30">
+                                    <span class="material-symbols-outlined text-base text-green-400">check_circle</span>
+                                    <p class="text-white text-sm font-medium leading-normal">Pendientes</p>
+                                    <span class="material-symbols-outlined text-base">arrow_drop_down</span>
+                                </button>
+                                <button id="btn-filter-assigned"
+                                    class="filter-btn flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#2c2839] pl-3 pr-3 hover:bg-primary/30">
+                                    <span
+                                        class="material-symbols-outlined text-base text-blue-400">arrow_right_alt</span>
+                                    <p class="text-white text-sm font-medium leading-normal">Asignados</p>
+                                    <span class="material-symbols-outlined text-base">arrow_drop_down</span>
+                                </button>
+                                <button id="btn-filter-returned"
+                                    class="filter-btn flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#2c2839] pl-3 pr-3 hover:bg-primary/30">
+                                    <span
+                                        class="material-symbols-outlined text-base text-gray-400">arrow_left_alt</span>
+                                    <p class="text-white text-sm font-medium leading-normal">Devueltos</p>
+                                    <span class="material-symbols-outlined text-base">arrow_drop_down</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-[#1C1C1C] rounded-lg overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-[#2c2839]">
+                                    <tr>
+                                        <th class="p-4 text-sm font-bold text-white uppercase tracking-wider">Nombre del
+                                            Material</th>
+                                        <th
+                                            class="p-4 text-sm font-bold text-white uppercase tracking-wider text-center">
+                                            Cantidad</th>
+                                        <th
+                                            class="p-4 text-sm font-bold text-white uppercase tracking-wider text-center">
+                                            Estado</th>
+                                        <th
+                                            class="p-4 text-sm font-bold text-white uppercase tracking-wider text-right">
+                                            Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <div id="event-calendar-page" class="page-content">
+                <div class="p-8">
+                    <h1 class="text-white text-4xl font-black mb-8">Calendario de Eventos</h1>
+                    <div id="tecnico-calendar"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-asignar-material" class="modal-backdrop">
+        <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-2xl m-4 flex flex-col" style="max-height: 80vh;">
+
+            <form id="form-asignar-material" class="flex flex-col h-full">
+                <div class="p-6 border-b border-input-dark">
+                    <h2 class="text-white text-2xl font-bold" id="modal-asignar-title">Asignar Material</h2>
+                    <p class="text-sm text-gray-400">Selecciona un material del stock disponible.</p>
+                    <input type="text" id="modal-search-material" placeholder="Buscar material en stock..."
+                        class="form-input w-full bg-[#2c2839] text-white border-none rounded-lg focus:ring-primary mt-4" />
+                </div>
+
+                <div id="modal-material-list" class="p-6 flex-1 overflow-y-auto space-y-2">
+                    <p class="text-gray-400">Cargando materiales...</p>
+                </div>
+
+                <div class="p-6 bg-[#2c2839] rounded-b-xl">
+                    <h3 class="text-white font-bold mb-2">Material Seleccionado:</h3>
+                    <p id="modal-selected-material-name" class="text-gray-300 mb-4">-- Ninguno --</p>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="number" name="cantidad_asignada" placeholder="Cantidad a Asignar" min="1"
+                            class="form-input bg-[#2c2839] text-white border-none rounded-lg focus:ring-primary"
+                            required />
+
+                        <div class="flex justify-end gap-4">
+                            <button type="button" id="btn-cancelar-modal-asignar"
+                                class="px-4 py-2 rounded-lg text-white/70 hover:bg-white/10">
+                                Cancelar
+                            </button>
+                            <button type="submit"
+                                class="px-4 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90">
+                                Asignar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-editar-cantidad" class="fixed inset-0 bg-black/50 hidden justify-center items-center z-50">
+        <div class="bg-card-dark rounded-xl shadow-lg w-full max-w-md m-4 border border-[#302839]">
+            <div class="flex justify-between items-center p-6 border-b border-[#302839]">
+                <h2 class="text-xl font-bold text-white">Gestionar Material</h2>
+                <button type="button" onclick="cerrarModal('modal-editar-cantidad')" 
+                        class="text-gray-400 hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="form-editar-cantidad" class="p-6 space-y-6">
+                <p id="modal-edit-material-name" class="text-primary font-bold text-xl text-center mb-2"></p>
+                
+                <input type="hidden" name="material_id">
+                <input type="hidden" name="cantidad_actual">
+                <input type="hidden" name="estado_actual">
+
+                <div class="space-y-2">
+                    <label class="text-gray-400 text-sm font-medium">Acción a realizar:</label>
+                    <div class="relative">
+                        <select id="accion-select" style="color-scheme: dark;"
+                                class="w-full p-3 bg-input-dark text-white rounded-lg border-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer font-medium">
+                            <option value="modificar" class="bg-input-dark text-white">Modificar Cantidad Solicitada</option>
+                            <option value="devolver" class="bg-input-dark text-white">Devolver Material</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-gray-400 text-sm font-medium">Cantidad:</label>
+                    <input type="number" name="nueva_cantidad" min="0" 
+                           class="w-full p-3 bg-input-dark text-white rounded-lg border-none focus:ring-2 focus:ring-primary text-xl font-bold text-center placeholder-gray-500" 
+                           placeholder="0" required />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" 
+                            class="px-4 py-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors font-medium" 
+                            onclick="cerrarModal('modal-editar-cantidad')">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-2 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-transform active:scale-95 shadow-lg shadow-primary/20">
+                        Confirmar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/tecnicos.js"></script>
+</body>
+
+</html>
