@@ -5,7 +5,6 @@ const { authenticateToken, authorizeAdmin } = require('../middleware/auth');
 
 // --- EVENTOS (CRUD BÁSICO) ---
 
-// En backend/routes/event.routes.js
 
 router.get('/', authenticateToken, async (req, res) => {
   try {
