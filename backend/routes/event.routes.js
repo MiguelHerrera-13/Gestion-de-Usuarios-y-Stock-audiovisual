@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req, res) => {
       start: evento.fecha + (evento.hora ? 'T' + evento.hora : ''),
       descripcion: evento.descripcion,
       notas_internas: evento.notas_internas,
-      hora: evento.hora // <--- ESTA LÍNEA ES LA CLAVE
+      hora: evento.hora 
     }));
     
     res.json(eventosParaCalendario);
