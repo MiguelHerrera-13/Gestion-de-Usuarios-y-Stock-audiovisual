@@ -14,8 +14,7 @@ router.get('/materiales', authenticateToken, async (req, res) => {
 });
 
 router.post('/materiales', authenticateToken, authorizeAdmin, async (req, res) => {
-    // ... Copia la lógica de tu server.js original para crear material ...
-    // Por brevedad, asumo que sabes copiar el INSERT INTO material...
+
     try {
         const { nombre_material, descripcion_material, umbral_minimo, cantidad, estado, categoria_id } = req.body;
         const [result] = await db.query(
@@ -107,7 +106,7 @@ router.post('/asignaciones/aprobar', authenticateToken, authorizeAdmin, async (r
             [cantidad_asignada, `Asignación aprobada para evento`, material_id, evento_id]
         );
 
-        // --- 🔔 NUEVA LÓGICA: ALERTA DE STOCK BAJO ---
+        // NUEVA LÓGICA: ALERTA DE STOCK BAJO ---
         // Calculamos cuánto quedó después de la resta
         const stockRestante = stockActual - cantidad_asignada;
 
